@@ -33,6 +33,9 @@ def sendWa():
     senderNo = textboxSender.get("1.0", "end-1c")
     #trim senderNo
     senderNo = senderNo.strip()
+
+    
+    msgO = text_widget.get("1.0", "end-1c")
     
      
 
@@ -42,26 +45,38 @@ def sendWa():
     ws = wb.active
     maxPB = ws.max_row-1
     maxPBr = 1/maxPB*100
+    maxC = ws.max_column
+    if ws.cell(row=1, column=maxC).value == "status":
+        maxCd = maxC-1 
+    else:
+        #add column name status
+        ws.cell(row=1, column=maxC+1).value = "status"
+        maxC=maxC+1
+        maxCd = maxC-1
 
     # with tqdm(total=int(maxPB)) as progress_bar:
     #iterate over rows by header name
-    for row in ws.iter_rows(min_row=2, max_row=ws.max_row, min_col=1, max_col=6):
-        syarikat = ws.cell(row=row[0].row, column=1).value
-        phoneNo = ws.cell(row=row[0].row, column=2).value
-        
-        expDate = ws.cell(row=row[0].row, column=3).value
-        #convert expDate to datetime
-        expDate = datetime.strptime(expDate, '%d/%m/%Y')
-        expDateF = expDate.strftime("%d %b %Y")
-        gredSyarikat = ws.cell(row=row[0].row, column=4).value
-        
+    # for row in ws.iter_rows(min_row=2, max_row=ws.max_row, min_col=1, max_col=6):
+    for row in ws.iter_rows(min_row=2, max_row=ws.max_row, min_col=1, max_col=maxCd):
+         # reset msg
+        msg = msgO
+        # nameP = str(row[0].value)
+        phoneNo = str(row[1].value)
 
-        #compile message from text_widget
-        message = text_widget.get("1.0", tk.END)
-        message = message.replace('<syarikat>', syarikat)
-        message = message.replace('<exp>', expDateF)
-        message = message.replace('<gred>', gredSyarikat)
-        message = message.replace('&', '%26')
+        # find all value of column until max columns and replace to msg string
+        # for cell in row:
+        for cell in row[0:maxCd]:
+        #limit iterate cell to maxC
+
+            varCell = cell.value
+            #check if varCell is datetime format
+            if isinstance(varCell, datetime):
+                varCell = varCell.strftime("%d/%m/%Y")
+
+
+            # msg = msg.replace('<field'+str(cell)+'>', str(cell.value))
+            msg = msg.replace('<field'+str(cell.column)+'>', str(varCell))
+            msg = msg.replace('&', '%26')
         
         progress_bar['value']+=maxPBr
         #update tkinter label percent
@@ -73,8 +88,8 @@ def sendWa():
 
         root.update_idletasks()
         
-        #check if cell in column 4(status) is empty
-        if ws.cell(row=row[0].row, column=5).value == None: 
+        #check if cell in column (status) is empty
+        if ws.cell(row=row[0].row, column=maxC).value == None: 
             #progressbar
             
             # progress_bar.update(1)
@@ -88,10 +103,10 @@ def sendWa():
             # response = wwjs_api.sendWhapi2(phoneNo, message)
 
             #guna whapi.io
-            response = baileys_api.sendWhapi2(senderNo, phoneNo, message)
+            response = baileys_api.sendWhapi2(senderNo, phoneNo, msg)
             #update cell with current date
-            ws.cell(row=row[0].row, column=5).value = response
-            ws.cell(row=row[0].row, column=6).value = datetime.now()
+            ws.cell(row=row[0].row, column=maxC).value = response+str(datetime.now())
+            # ws.cell(row=row[0].row, column=maxC+1).value = 
             # ws.cell(row=row[0].row, column=5).value = "response"
             
             #save workbook
@@ -117,13 +132,13 @@ def sendWa():
 
 
 #create label
-labelSender = tk.Label(root, text="Sender Number 601xxxxx (Wajib)")
+labelSender = tk.Label(root, text="Sender Number 601xxxxx (Must)")
 #create textbox
 textboxSender = tk.Text(root, height=1, width=14)
 
 
 #create label
-labelDelay = tk.Label(root, text="Delay Random from - to in seconds (wajib)")
+labelDelay = tk.Label(root, text="Delay Random from - to in seconds (Must)")
 labelDelay2 = tk.Label(root, text="-")
 
 #create textbox
@@ -141,11 +156,11 @@ progress_bar = ttk.Progressbar(root, style='text.Horizontal.TProgressbar', lengt
 labelPercent = ttk.Label(root, text="0%")
 
 #create label
-labelMsg = tk.Label(root, text="tulis Variable Header, contoh: <syarikat> <exp>") 
+labelMsg = tk.Label(root, text="Write message, eg: <field1>.., <field2> is column Receiver Number") 
 
 #create label
-labelFile = tk.Label(root, text="Pastikan nama file adalah wassap.xlsx") 
-labelFormat = tk.Label(root, text="format contoh: syarikat, phone, exp, gred, status, time") 
+labelFile = tk.Label(root, text="Default file wassap.xlsx on same directory") 
+labelFormat = tk.Label(root, text="format contoh: field1 = Name, field2 = Phone No., last column = status") 
 # Create the text widget
 text_widget = tk.Text(root, height=15, width=40)
  
