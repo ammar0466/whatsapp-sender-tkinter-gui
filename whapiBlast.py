@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog as fd
 from tkinter.messagebox import showinfo
+import webbrowser
 import requests
 import pyqrcodeng as pyqrcode
 # from tqdm.auto import tqdm
@@ -14,6 +15,7 @@ from openpyxl.workbook import Workbook
 from openpyxl import load_workbook
 import baileys_api 
 import json
+from tkinter import filedialog
 import qrcode
 
 # import wwjs_api
@@ -27,8 +29,13 @@ root.title('Whatsapp Sender v1.07')
 root.resizable(False, False)
 root.geometry('400x550')
 
-serverIp = "xxx.xxx.xxx.xxx"
-serverPort = "7070"
+#get apiserver value from config.ini file
+config = configparser.ConfigParser()
+config.read('config.ini')
+apiserver = config['server']['apiserver']
+filename = ""
+
+
 
 def delaydulu():
     delay1 =textboxDelay.get("1.0", "end-1c")
@@ -48,7 +55,7 @@ def sendWa():
 
     # print (senderNo)
     #load workbook
-    wb = load_workbook('wassap.xlsx')
+    wb = load_workbook(filename)
     ws = wb.active
     maxPB = ws.max_row-1
     maxPBr = 1/maxPB*100
@@ -82,7 +89,7 @@ def sendWa():
 
 
             # msg = msg.replace('<field'+str(cell)+'>', str(cell.value))
-            msg = msg.replace('<field'+str(cell.column)+'>', str(varCell))
+            msg = msg.replace('<col'+str(cell.column)+'>', str(varCell))
             msg = msg.replace('&', '%26')
         
         progress_bar['value']+=maxPBr
@@ -117,7 +124,7 @@ def sendWa():
             # ws.cell(row=row[0].row, column=5).value = "response"
             
             #save workbook
-            wb.save('wassap.xlsx')
+            wb.save(filename)
             #update progress bar
             # add delay
             delaydulu()
@@ -158,6 +165,27 @@ helpmenu = tk.Menu(menubar, tearoff=0)
 helpmenu.add_command(label="About", command=lambda:about())
 menubar.add_cascade(label="Help", menu=helpmenu)
 root.config(menu=menubar)
+
+#when clicked about, open link to github
+
+def about():
+    webbrowser.open('https://github.com/ammar0466/whatsapp-sender-tkinter-gui')
+
+
+#when click open file, select .xls or xlsx file from same folder
+    
+def openFile():
+
+    global filename
+    filetypes = (
+        ('Excel files', '*.xlsx'),
+        ('All files', '*.*')
+    )
+
+    filename = filedialog.askopenfilename(initialdir = ".",title = "Select file",filetypes=filetypes)
+    labelFile = tk.Label(root, text=filename)
+    labelFile.pack() 
+
 
 #when clicked on Set Server open setting window
 def setting():
@@ -218,7 +246,7 @@ def addSender():
         senderNumber = textboxSender.get("1.0", "end-1c")
 
         # send senderID to baileys-api to get qr code
-        urlQr = f"http://{serverIp}:{serverPort}/sessions/add"
+        urlQr = f"http://{apiserver}/sessions/add"
 
         payload=f"id={senderNumber}&isLegacy=false"
         headers = {
@@ -240,7 +268,7 @@ def addSender():
         #print response to console
         # print (response)
         #print qr last 10 character
-        print (qr[-10:])
+        # print (qr[-10:])
 
         imge = tk.PhotoImage(data=qr)
         #output qr code to tkinter label
@@ -334,8 +362,17 @@ labelDelay = tk.Label(root, text="Delay Random from - to in seconds (Must)")
 labelDelay2 = tk.Label(root, text="-")
 
 #create textbox
+#tk.text with default value
+
+
+
 textboxDelay = tk.Text(root, height=1, width=10)
+
+#insert default value to textbox
+textboxDelay.insert(tk.END, "5")
+# textboxDelay.insert(0, "5")
 textboxDelay2 = tk.Text(root, height=1, width=10)
+textboxDelay2.insert(tk.END, "7")
 
 check_button = ttk.Button(
     root,
@@ -348,11 +385,11 @@ progress_bar = ttk.Progressbar(root, style='text.Horizontal.TProgressbar', lengt
 labelPercent = ttk.Label(root, text="0%")
 
 #create label
-labelMsg = tk.Label(root, text="Write message, eg: <field1>.., <field2> is column Receiver Number") 
+labelMsg = tk.Label(root, text="Write message, eg: <col1> , <col2> is column Receiver Number") 
 
 #create label
-labelFile = tk.Label(root, text="Default file wassap.xlsx on same directory") 
-labelFormat = tk.Label(root, text="format contoh: field1 = Name, field2 = Phone No., last column = status") 
+labelFile = tk.Label(root, text="Open file xlsx/xls") 
+labelFormat = tk.Label(root, text="Format File: Column1 = Name, Column2 = Phone No., last column = status") 
 # Create the text widget
 text_widget = tk.Text(root, height=15, width=40)
  
