@@ -2,9 +2,13 @@
 
 simple gui for using baileys-api
 send through excel file list
-named file wassap.xlsx on same directory
 
-![image](https://user-images.githubusercontent.com/10081943/192450137-7ff5ed95-9b1d-42a7-bb2e-0f0aa55b8323.png)
+![image](https://user-images.githubusercontent.com/10081943/193499229-492dad10-58b8-4609-82b6-11fee271374e.png)
+
+##Sample message
+Hi, <col1>
+You account will expired on <col3>
+Thanks
 
 
 example excel file 
