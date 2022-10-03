@@ -6,8 +6,8 @@ Send through excel file list
 ![image](https://user-images.githubusercontent.com/10081943/193499229-492dad10-58b8-4609-82b6-11fee271374e.png)
 
 **Sample message :**
->>Hi, <col1>
-You account will expired on <col3>
+>>Hi, \<col1\>
+You account will expired on \<col3\>
 Thanks
 
 
@@ -21,7 +21,7 @@ Example excel file
 4. Open file .xlsx or .xls
 5. Set sender number used for sending
 4. Set time delay between message.
-5. Write template message using format <col1>, <col2>, <col3>
+5. Write template message using format \<col1\>, \<col2\>, \<col3\>
 6. click send
 7. Status column will added to file so make sure there is no column named 'status'
 
