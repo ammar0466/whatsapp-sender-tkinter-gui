@@ -25,9 +25,9 @@ import threading
 
 # create the root window
 root = tk.Tk()
-root.title('Whatsapp Sender v1.07')
+root.title('Whatsapp Sender v3.0')
 root.resizable(False, False)
-root.geometry('400x550')
+root.geometry('400x650')
 
 #get apiserver value from config.ini file
 config = configparser.ConfigParser()
@@ -47,6 +47,11 @@ def sendWa():
     senderNo = textboxSender.get("1.0", "end-1c")
     #trim senderNo
     senderNo = senderNo.strip()
+
+    imageUrlx = imageUrl.get("1.0", "end-1c")
+    #if imageUrlx is not empty
+    
+
 
     
     msgO = text_widget.get("1.0", "end-1c")
@@ -117,7 +122,17 @@ def sendWa():
             # response = wwjs_api.sendWhapi2(phoneNo, message)
 
             #guna whapi.io
+
+            # if imageUrlx is not empty
+            if imageUrlx != "":
+                #send image
+                response = baileys_api.sendImg(senderNo, phoneNo, imageUrlx)
+            
+            
             response = baileys_api.sendWhapi2(senderNo, phoneNo, msg)
+
+            
+
             #update cell with current date
             ws.cell(row=row[0].row, column=maxC).value = response+str(datetime.now())
             # ws.cell(row=row[0].row, column=maxC+1).value = 
@@ -387,6 +402,14 @@ labelPercent = ttk.Label(root, text="0%")
 #create label
 labelMsg = tk.Label(root, text="Write message, eg: <col1> , <col2> is column Receiver Number") 
 
+#create label for textbox name image Url
+labelImage = tk.Label(root, text="Image Url")
+
+#create textbox to image url
+imageUrl = tk.Text(root, height=1, width=30)
+#insert default value to textbox
+
+
 #create label
 labelFile = tk.Label(root, text="Open file xlsx/xls") 
 labelFormat = tk.Label(root, text="Format File: Column1 = Name, Column2 = Phone No., last column = status") 
@@ -404,8 +427,10 @@ textboxDelay.pack()
 labelDelay2.pack()
 textboxDelay2.pack()
 labelMsg.pack()
- 
+
 text_widget.pack()
+labelImage.pack(pady=5)
+imageUrl.pack(pady=5)
 check_button.pack(pady=10)
 progress_bar.pack(pady=5)
 labelPercent.pack()
