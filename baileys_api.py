@@ -12,9 +12,17 @@ def sendWhapi2 (sender, number, message):
     # 601154285983
     url = f"http://{apiserver}/chats/send?id={sender}"
 
-    payload=f"receiver={number}&message={message}"
+    # payload=f"receiver={number}&message={message}"
+    payload = json.dumps({
+        "receiver": number,
+        "message": {
+            "text": message
+            
+        }
+    })
+    
     headers = {
-      'Content-Type': 'application/x-www-form-urlencoded'
+      'Content-Type': 'application/json'
     }
 
     response = requests.request("POST", url, headers=headers, data=payload)
@@ -22,32 +30,26 @@ def sendWhapi2 (sender, number, message):
 
     return(response['message'])
 
-# def sendWhapi(x, y, z):
-#     url = "https://whapi.io/api/send"
+def sendImg (sender, number, image):
+    # 601154285983
+    url = f"http://{apiserver}/chats/send?id={sender}"
+
+    # payload=f"receiver={number}&message={message}"
+    payload = json.dumps({
+        "receiver": number,
+        "message": {
+            "image": {
+                "url": image
+            }
+          }
+    })
     
-#     payload = json.dumps({
-#       "app": {
-#         "id": y,
-#         "time": "1646716022",
-#         "data": {
-#           "recipient": {
-#             "id": x
-#           },
-#           "message": [
-#             {
-#               "time": "1646716022",
-#               "type": "text",
-#               "value": z
-#             }
-#           ]
-#         }
-#       }
-#     })
+    headers = {
+      'Content-Type': 'application/json'
+    }
 
-#     headers = {
-#       'Content-Type': 'application/json'
-#     }
+    response = requests.request("POST", url, headers=headers, data=payload)
+    response = json.loads(response.text)
 
-#     response = requests.request("POST", url, headers=headers, data=payload)
-#     return response.text
-    # print(x)
+    return(response['message'])
+
