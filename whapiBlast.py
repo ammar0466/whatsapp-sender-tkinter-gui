@@ -95,7 +95,7 @@ def sendWa():
 
             # msg = msg.replace('<field'+str(cell)+'>', str(cell.value))
             msg = msg.replace('<col'+str(cell.column)+'>', str(varCell))
-            msg = msg.replace('&', '%26')
+            # msg = msg.replace('&', '%26')
         
         progress_bar['value']+=maxPBr
         #update tkinter label percent
